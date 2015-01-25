@@ -15,8 +15,8 @@ SRC_URI = "\
         file://google-chrome \
         file://google-chrome.desktop \
 "
-SRC_URI[md5sum] = "be4d3ad6944e43132e4fbde5a23d1ab8"
-SRC_URI[sha256sum] = "d3303519ab471a3bc831e9b366e64dc2fe651894e52ae5d1e74de60ee2a1198a"
+SRC_URI[md5sum] = "4e55014ffc3ad70df1c5ef7b02617e2c"
+SRC_URI[sha256sum] = "ab5dc1844d83eb1c2db170a4aa577785e35caa89c42295c4ea39cfb6ca8276f5"
 
 # PACKAGECONFIG explanations:
 #
@@ -68,9 +68,12 @@ OZONE_WAYLAND_EXTRA_PATCHES = " \
 "
 
 OZONE_WAYLAND_GIT_DESTSUFFIX = "ozone-wayland-git"
-OZONE_WAYLAND_GIT_BRANCH = "Milestone-Harvest"
-OZONE_WAYLAND_GIT_SRCREV = "0f8b830730d9b696a667c331c50ac6333bb85c13"
-SRC_URI += "${@base_conditional('ENABLE_WAYLAND', '1', 'git://github.com/01org/ozone-wayland.git;destsuffix=${OZONE_WAYLAND_GIT_DESTSUFFIX};branch=${OZONE_WAYLAND_GIT_BRANCH};rev=${OZONE_WAYLAND_GIT_SRCREV}', '', d)}"
+OZONE_WAYLAND_GIT_BRANCH = "master"
+OZONE_WAYLAND_GIT_SRCREV = "744467a397b551ce39a4a69ec3ad91e25f70b4b4"
+SRC_URI += "${@base_conditional('ENABLE_WAYLAND', '1',\
+	 'git://github.com/01org/ozone-wayland.git;destsuffix=${OZONE_WAYLAND_GIT_DESTSUFFIX};branch=${OZONE_WAYLAND_GIT_BRANCH};rev=${OZONE_WAYLAND_GIT_SRCREV}\
+	  file://0001-Disable-VaapiVideoDecodeAccelerator-for-on-ARM.patch\
+	', '', d)}"
 
 do_unpack[postfuncs] += "${@base_conditional('ENABLE_WAYLAND', '1', 'copy_ozone_wayland_files', '', d)}"
 do_patch[prefuncs] += "${@base_conditional('ENABLE_WAYLAND', '1', 'add_ozone_wayland_patches', '', d)}"
@@ -144,7 +147,7 @@ python() {
         d.appendVar('DEPENDS', ' xextproto gtk+ libxi libxss ')
     if d.getVar('ENABLE_WAYLAND', True) == '1':
         d.appendVar('DEPENDS', ' wayland libxkbcommon ')
-        d.appendVar('GYP_DEFINES', ' use_ash=1 use_aura=1 chromeos=0 use_ozone=1 ')
+        d.appendVar('GYP_DEFINES', ' use_ash=1 use_aura=1 chromeos=0 use_ozone=1 use_xkbcommon=1')
 }
 
 do_configure() {

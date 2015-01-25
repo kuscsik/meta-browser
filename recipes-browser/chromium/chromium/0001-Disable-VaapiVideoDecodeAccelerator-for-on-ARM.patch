@@ -1,0 +1,28 @@
+From c1534f8057a99d04ea014468b896c41f6cc449d3 Mon Sep 17 00:00:00 2001
+From: Zoltan Kuscsik <zoltan.kuscsik@linaro.org>
+Date: Sun, 25 Jan 2015 09:19:19 +0100
+Subject: [PATCH] Disable VaapiVideoDecodeAccelerator for on ARM
+
+Content shell has is built without VaapiVideoDecodeAccelerator
+on ARM. This is a temporary workaround to make Wayland
+built on ARM.
+---
+ ozone/media/media_ozone_platform_wayland.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ozone/media/media_ozone_platform_wayland.cc b/ozone/media/media_ozone_platform_wayland.cc
+index 9481b09..9c6862b 100644
+--- a/ozone/media/media_ozone_platform_wayland.cc
++++ b/ozone/media/media_ozone_platform_wayland.cc
+@@ -22,7 +22,7 @@ class MediaOzonePlatformWayland : public MediaOzonePlatform {
+   // MediaOzonePlatform:
+   media::VideoDecodeAccelerator* CreateVideoDecodeAccelerator(
+       const base::Callback<bool(void)>& make_context_current) override {
+-    return new content::VaapiVideoDecodeAccelerator(make_context_current);
++    return NULL; //new content::VaapiVideoDecodeAccelerator(make_context_current);
+   }
+ 
+  private:
+-- 
+1.9.1
+
