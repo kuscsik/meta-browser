@@ -116,6 +116,8 @@ inherit gettext
 
 PACKAGECONFIG ??= "use-egl"
 
+CHROMIUM_BUILD_TYPE = "Release"
+
 # this makes sure the dependencies for the EGL mode are present; otherwise, the configure scripts
 # automatically and silently fall back to GLX
 PACKAGECONFIG[use-egl] = ",,virtual/egl virtual/libgles2"
@@ -164,7 +166,7 @@ do_configure() {
 
 do_compile() {
 	# build with ninja
-	ninja -C ${S}/out/Release chrome chrome_sandbox
+	ninja -C ${S}/out/${CHROMIUM_BUILD_TYPE} chrome chrome_sandbox
 }
 
 do_install() {
@@ -179,29 +181,29 @@ do_install() {
 	install -m 0644 ${WORKDIR}/google-chrome.desktop ${D}${datadir}/applications/
 
 	install -d ${D}${bindir}/chrome/
-	install -m 0755 ${S}/out/Release/chrome ${D}${bindir}/chrome/chrome
-	install -m 0644 ${S}/out/Release/resources.pak ${D}${bindir}/chrome/
-	install -m 0644 ${S}/out/Release/icudtl.dat ${D}${bindir}/chrome/
-	install -m 0644 ${S}/out/Release/snapshot_blob.bin ${D}${bindir}/chrome/
-	install -m 0644 ${S}/out/Release/natives_blob.bin ${D}${bindir}/chrome/
-	install -m 0644 ${S}/out/Release/content_resources.pak ${D}${bindir}/chrome/
-	install -m 0644 ${S}/out/Release/keyboard_resources.pak ${D}${bindir}/chrome/
-	install -m 0644 ${S}/out/Release/chrome_100_percent.pak ${D}${bindir}/chrome/
-	install -m 0644 ${S}/out/Release/product_logo_48.png ${D}${bindir}/chrome/
-	install -m 0755 ${S}/out/Release/libffmpegsumo.so ${D}${bindir}/chrome/
+	install -m 0755 ${S}/out/${CHROMIUM_BUILD_TYPE}/chrome ${D}${bindir}/chrome/chrome
+	install -m 0644 ${S}/out/${CHROMIUM_BUILD_TYPE}/resources.pak ${D}${bindir}/chrome/
+	install -m 0644 ${S}/out/${CHROMIUM_BUILD_TYPE}/icudtl.dat ${D}${bindir}/chrome/
+	install -m 0644 ${S}/out/${CHROMIUM_BUILD_TYPE}/snapshot_blob.bin ${D}${bindir}/chrome/
+	install -m 0644 ${S}/out/${CHROMIUM_BUILD_TYPE}/natives_blob.bin ${D}${bindir}/chrome/
+	install -m 0644 ${S}/out/${CHROMIUM_BUILD_TYPE}/content_resources.pak ${D}${bindir}/chrome/
+	install -m 0644 ${S}/out/${CHROMIUM_BUILD_TYPE}/keyboard_resources.pak ${D}${bindir}/chrome/
+	install -m 0644 ${S}/out/${CHROMIUM_BUILD_TYPE}/chrome_100_percent.pak ${D}${bindir}/chrome/
+	install -m 0644 ${S}/out/${CHROMIUM_BUILD_TYPE}/product_logo_48.png ${D}${bindir}/chrome/
+	install -m 0755 ${S}/out/${CHROMIUM_BUILD_TYPE}/libffmpegsumo.so ${D}${bindir}/chrome/
 
 	# Always adding this libdir (not just with component builds), because the
 	# LD_LIBRARY_PATH line in the google-chromium script refers to it
 	install -d ${D}${libdir}/chrome/
 	if [ -n "${@bb.utils.contains('PACKAGECONFIG', 'component-build', 'component-build', '', d)}" ]; then
-		install -m 0755 ${S}/out/Release/lib/*.so ${D}${libdir}/chrome/
+		install -m 0755 ${S}/out/${CHROMIUM_BUILD_TYPE}/lib/*.so ${D}${libdir}/chrome/
 	fi
 
 	install -d ${D}${sbindir}
-	install -m 4755 ${S}/out/Release/chrome_sandbox ${D}${sbindir}/chrome-devel-sandbox
+	install -m 4755 ${S}/out/${CHROMIUM_BUILD_TYPE}/chrome_sandbox ${D}${sbindir}/chrome-devel-sandbox
 
 	install -d ${D}${bindir}/chrome/locales/
-	install -m 0644 ${S}/out/Release/locales/en-US.pak ${D}${bindir}/chrome/locales
+	install -m 0644 ${S}/out/${CHROMIUM_BUILD_TYPE}/locales/en-US.pak ${D}${bindir}/chrome/locales
 }
 
 FILES_${PN} = "${bindir}/chrome/ ${bindir}/google-chrome ${datadir}/applications ${sbindir}/ ${libdir}/chrome/"
