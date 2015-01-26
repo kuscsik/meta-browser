@@ -182,6 +182,8 @@ do_install() {
 	install -m 0755 ${S}/out/Release/chrome ${D}${bindir}/chrome/chrome
 	install -m 0644 ${S}/out/Release/resources.pak ${D}${bindir}/chrome/
 	install -m 0644 ${S}/out/Release/icudtl.dat ${D}${bindir}/chrome/
+	install -m 0644 ${S}/out/Release/snapshot_blob.bin ${D}${bindir}/chrome/
+	install -m 0644 ${S}/out/Release/natives_blob.bin ${D}${bindir}/chrome/
 	install -m 0644 ${S}/out/Release/content_resources.pak ${D}${bindir}/chrome/
 	install -m 0644 ${S}/out/Release/keyboard_resources.pak ${D}${bindir}/chrome/
 	install -m 0644 ${S}/out/Release/chrome_100_percent.pak ${D}${bindir}/chrome/
