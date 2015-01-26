@@ -15,6 +15,7 @@ SRC_URI = "\
         file://google-chrome \
         file://google-chrome.desktop \
 "
+
 SRC_URI[md5sum] = "4e55014ffc3ad70df1c5ef7b02617e2c"
 SRC_URI[sha256sum] = "ab5dc1844d83eb1c2db170a4aa577785e35caa89c42295c4ea39cfb6ca8276f5"
 
@@ -58,6 +59,12 @@ ENABLE_X11 = "${@base_contains('DISTRO_FEATURES', 'x11', '1', '0', d)}"
 ENABLE_WAYLAND = "${@base_contains('DISTRO_FEATURES', 'x11', '0', \
                      base_contains('DISTRO_FEATURES', 'wayland', '1', \
                      '0', d),d)}"
+
+# GST PPAPI plugin
+GSTREAMER_PPAPI_REVISION="9ea22c077568b698bd691d4fb9a9ae4c83d71bea"
+SRC_URI += "file://0002-Add-support-for-ppapi-gst.patch\
+ 	  git://lhg-review.linaro.org:29418/lhg/chromium/ppapi/gstreamer;branch=master;protocol=ssh;rev=${GSTREAMER_PPAPI_REVISION};destsuffix=${S}/ppapi/gstreamer\	
+	"
 
 # variable for extra ozone-wayland patches, typically extended by BSP layer .bbappends
 # IMPORTANT: do not simply add extra ozone-wayland patches to the SRC_URI in a
@@ -166,7 +173,7 @@ do_configure() {
 
 do_compile() {
 	# build with ninja
-	ninja -C ${S}/out/${CHROMIUM_BUILD_TYPE} chrome chrome_sandbox
+	ninja -C ${S}/out/${CHROMIUM_BUILD_TYPE} chrome chrome_sandbox ppapi_gstreamer
 }
 
 do_install() {
