@@ -61,7 +61,7 @@ ENABLE_WAYLAND = "${@base_contains('DISTRO_FEATURES', 'x11', '0', \
                      '0', d),d)}"
 
 # GST PPAPI plugin
-GSTREAMER_PPAPI_REVISION="9ea22c077568b698bd691d4fb9a9ae4c83d71bea"
+GSTREAMER_PPAPI_REVISION="576f2ca83e7adfbe2f809941fa0fc98afa09ffef"
 SRC_URI += "file://0002-Add-support-for-ppapi-gst.patch\
  	  git://lhg-review.linaro.org:29418/lhg/chromium/ppapi/gstreamer;branch=master;protocol=ssh;rev=${GSTREAMER_PPAPI_REVISION};destsuffix=${S}/ppapi/gstreamer\	
 	"
