@@ -1,0 +1,53 @@
+diff --git a/extensions/browser/api/usb/usb_api.cc b/extensions/browser/api/usb/usb_api.cc
+index d02cadb..9f4b3a6 100644
+--- a/extensions/browser/api/usb/usb_api.cc
++++ b/extensions/browser/api/usb/usb_api.cc
+@@ -938,7 +938,7 @@ ExtensionFunction::ResponseAction UsbControlTransferFunction::Run() {
+   }
+ 
+   const ControlTransferInfo& transfer = parameters->transfer_info;
+-  UsbEndpointDirection direction;
++  UsbEndpointDirection direction = device::USB_DIRECTION_INBOUND;
+   UsbDeviceHandle::TransferRequestType request_type;
+   UsbDeviceHandle::TransferRecipient recipient;
+   size_t size = 0;
+@@ -995,7 +995,7 @@ ExtensionFunction::ResponseAction UsbBulkTransferFunction::Run() {
+   }
+ 
+   const GenericTransferInfo& transfer = parameters->transfer_info;
+-  UsbEndpointDirection direction;
++  UsbEndpointDirection direction = device::USB_DIRECTION_INBOUND;
+   size_t size = 0;
+ 
+   if (!ConvertDirectionFromApi(transfer.direction, &direction)) {
+@@ -1041,7 +1041,7 @@ ExtensionFunction::ResponseAction UsbInterruptTransferFunction::Run() {
+   }
+ 
+   const GenericTransferInfo& transfer = parameters->transfer_info;
+-  UsbEndpointDirection direction;
++  UsbEndpointDirection direction = device::USB_DIRECTION_INBOUND;
+   size_t size = 0;
+ 
+   if (!ConvertDirectionFromApi(transfer.direction, &direction)) {
+@@ -1089,7 +1089,7 @@ ExtensionFunction::ResponseAction UsbIsochronousTransferFunction::Run() {
+   const IsochronousTransferInfo& transfer = parameters->transfer_info;
+   const GenericTransferInfo& generic_transfer = transfer.transfer_info;
+   size_t size = 0;
+-  UsbEndpointDirection direction;
++  UsbEndpointDirection direction = device::USB_DIRECTION_INBOUND;
+ 
+   if (!ConvertDirectionFromApi(generic_transfer.direction, &direction)) {
+     return RespondNow(Error(kErrorConvertDirection));
+diff --git a/third_party/cacheinvalidation/src/google/cacheinvalidation/include/types.h b/third_party/cacheinvalidation/src/google/cacheinvalidation/include/types.h
+index 4e3be27..835e956 100644
+--- a/third_party/cacheinvalidation/src/google/cacheinvalidation/include/types.h
++++ b/third_party/cacheinvalidation/src/google/cacheinvalidation/include/types.h
+@@ -172,7 +172,7 @@ class ErrorInfo {
+  */
+ class ObjectId {
+  public:
+-  ObjectId() : is_initialized_(false) {}
++  ObjectId() : is_initialized_(false), source_(0) {}
+ 
+   /* Creates an object id for the given source and name (the name is copied). */
+   ObjectId(int source, const string& name)

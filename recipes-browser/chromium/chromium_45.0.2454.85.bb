@@ -96,6 +96,7 @@ SRC_URI += "\
         file://chromium-45/build_fixes_for_latest_oe_mater.patch \
         file://unistd-2.patch \
         file://chromium-45/fix_64_bit_builds.patch \
+        file://chromium-45/0001-Fix-undefined-GCC-warnings-with-GCC-5.x.patch \
 "
 
 # Workaround for Chromium bug #545904
