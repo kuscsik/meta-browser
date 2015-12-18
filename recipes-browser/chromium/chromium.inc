@@ -25,7 +25,7 @@ PACKAGECONFIG[ignore-lost-context] = ""
 PACKAGECONFIG[impl-side-painting] = ""
 PACKAGECONFIG[use-gl] = ""
 
-GYP_DEFINES += "${ARMFPABI} release_extra_cflags='-Wno-error=unused-local-typedefs' sysroot=''"
+GYP_DEFINES += "${ARMFPABI} remove_webcore_debug_symbols=1 release_extra_cflags='-Wno-error=unused-local-typedefs' sysroot=''"
 
 do_configure() {
 	cd ${S}
