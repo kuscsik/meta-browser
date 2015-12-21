@@ -4,6 +4,7 @@
     'disable_nacl': 1,
     'proprietary_codecs': 1,
     'v8_use_snapshot': 1,
+    'ffmpeg_branding' : 'Chrome',
     'use_system_ffmpeg': 0,
     'linux_link_kerberos': 0,
     'use_allocator': 0,
