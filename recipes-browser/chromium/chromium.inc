@@ -25,7 +25,7 @@ PACKAGECONFIG[ignore-lost-context] = ""
 PACKAGECONFIG[impl-side-painting] = ""
 PACKAGECONFIG[use-gl] = ""
 
-GYP_DEFINES += "${ARMFPABI} remove_webcore_debug_symbols=1 release_extra_cflags='-Wno-error=unused-local-typedefs' sysroot=''"
+GYP_DEFINES += "${ARMFPABI} fastbuild=1 remove_webcore_debug_symbols=1 release_extra_cflags='-Wno-error=unused-local-typedefs' sysroot=''"
 
 do_configure() {
 	cd ${S}
@@ -36,6 +36,12 @@ do_configure() {
 	CXX="${CXX}" export CXX
 	CC_host="${BUILD_CC}" export CC_host
 	CXX_host="${BUILD_CXX}" export CXX_host
+    # We pass the target configurations to the chromium build system
+    # there is no need to explicitely pass the C/CPP flags here since they
+    # conflict with the parameters calculted using GYP
+    CFLAGS=""
+    CPPFLAGS=""
+    CXXFLAGS=""
 }
 
 do_install() {
