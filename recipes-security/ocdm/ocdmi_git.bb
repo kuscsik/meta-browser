@@ -16,11 +16,18 @@ S = "${WORKDIR}/git"
 #
 # * debug-build : Builds OCDM with debug symbols and verbose logging.
 
-DEPENDS_append = "  openssl portmap"
+PACKAGECONFIG ?= "use-playready debug-build"
+
+DEPENDS_append = "  openssl "
+
+PACKAGECONFIG[use-playready] = "--enable-playready"
+PACKAGECONFIG[debug-build] = "--enable-debug"
 
 # Only ClearKey implementation depends on ssl
 DEPENDS_remove = " \
   ${@base_contains('PACKAGECONFIG','use-playready','openssl','',d)} \
   "
-
+DEPENDS_append = " \
+  ${@base_contains('PACKAGECONFIG','use-playready','optee-playready playready','',d)} \
+ "
 inherit autotools
