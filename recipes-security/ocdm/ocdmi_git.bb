@@ -30,4 +30,9 @@ DEPENDS_remove = " \
 DEPENDS_append = " \
   ${@base_contains('PACKAGECONFIG','use-playready','optee-playready playready','',d)} \
  "
+
+pkg_postinst_${PN} () {
+    echo 127.0.0.1    ${MACHINE} >> $D/etc/hosts
+}
+
 inherit autotools
