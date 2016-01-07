@@ -26,6 +26,7 @@ SRC_URI = "\
         file://oe-defaults.gypi \
         ${@bb.utils.contains('PACKAGECONFIG', 'component-build', 'file://component-build.gypi', '', d)} \
         file://google-chrome \
+        file://chrome-eme \
         file://google-chrome.desktop \
         ${@bb.utils.contains('PACKAGECONFIG', 'test-data', 'http://gsdview.appspot.com/chromium-browser-official/${P}-testdata.tar.xz;name=test-data', '', d)} \
 "

@@ -48,6 +48,9 @@ do_install() {
 	if [ -f "${WORKDIR}/google-chrome" ]; then
 		install -Dm 0755 ${WORKDIR}/google-chrome ${D}${bindir}/google-chrome
 	fi
+
+	install -Dm 0755 ${WORKDIR}/chrome-eme ${D}${bindir}/chrome-eme
+
 	if [ -f "${WORKDIR}/cef-simple" ]; then
 		install -Dm 0755 ${WORKDIR}/cef-simple ${D}${bindir}/cef-simple
 	fi
