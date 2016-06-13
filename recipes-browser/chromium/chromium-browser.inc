@@ -1,88 +1,18 @@
-# Recipe files have to perform the following tasks after including this file:
-# 1) Add patches to SRC_URI. Version specific patches should be contained in a
-#    "chromium-XX" subdirectory, where XX is the major version. There are also
-#    patches that are shared amongst versions but may one day no longer be
-#    needed (like unistd2.patch). These do not belong in such a subdirectory,
-#    but still need to be explicitely be added. Do NOT add ozone-wayland patches
-#    to SRC_URI here!
-# 2) Add md5sum and sha256sum hashes of the tarball.
-# 3) Add ozone-wayland patches to the OZONE_WAYLAND_EXTRA_PATCHES variable.
-#    The rule with the chromium-XX subdirectory also applies here.
-# 4) Set the OZONE_WAYLAND_GIT_BRANCH and OZONE_WAYLAND_GIT_SRCREV values.
-# 5) Optionally, set values for these variables:
-#    * OZONE_WAYLAND_PATCH_FILE_GLOB
-#    * OZONE_WAYLAND_GIT_DESTSUFFIX
-#    * CHROMIUM_X11_DEPENDS
-#    * CHROMIUM_X11_GYP_DEFINES
-#    * CHROMIUM_WAYLAND_DEPENDS
-#    * CHROMIUM_WAYLAND_GYP_DEFINES
-
 include chromium.inc
+inherit gclient-fetch
 
 DESCRIPTION = "Chromium browser"
 DEPENDS += "libgnome-keyring"
 
 SRC_URI = "\
-        http://gsdview.appspot.com/chromium-browser-official/${P}.tar.xz \
-        file://include.gypi \
-        file://oe-defaults.gypi \
-        file://google-chrome \
-        file://google-chrome.desktop \
+        gclient://chromium.googlesource.com/chromium/src.git;protocol=https;tag=51.0.2704.90 \
+        https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64/clang-263324-1.tgz;subdir=gclient/src/third_party/llvm-build/Release+Asserts/  \
 "
 
+SRC_URI[md5sum] = "b8fc4d0cadcc965fc43bf3fee01ca32e"
+SRC_URI[sha256sum] = "c4f12b94351708a9d0756c85a15f123426ef47c5920c76da73b2fe7de3336de9"
 
-# PACKAGECONFIG options
-# ^^^^^^^^^^^^^^^^^^^^^
-# * use-egl: (on by default)
-#       Without this packageconfig, the Chromium build will use GLX for
-#       creating an OpenGL context in X11, and regular OpenGL for painting
-#       operations. Neither are desirable on embedded platforms. With this
-#       packageconfig, EGL and OpenGL ES 2.x are used instead.
-#
-# * disable-api-keys-info-bar: (off by default)
-#       This disables the info bar that warns: "Google API keys are missing".
-#       With some builds, missing API keys are considered OK, so the bar needs
-#       to go. Conversely, if Chromium is compiled with this option off and
-#       the user wishes to disable the warning, the following lines can be
-#       added to the "google-chrome" script (see patchset) before the
-#       chromium binary is called:
-#           export GOOGLE_API_KEY="no"
-#           export GOOGLE_DEFAULT_CLIENT_ID="no"
-#           export GOOGLE_DEFAULT_CLIENT_SECRET="no"
-#
-# * component-build: (off by default)
-#       Enables component build mode. By default, all of Chromium (with the
-#       exception of FFmpeg) is linked into one big binary. The linker step
-#       requires at least 8 GB RAM. Component mode was created to facilitate
-#       development and testing, since with it, there is not one big binary;
-#       instead, each component is linked to a separate shared object. Use
-#       component mode for development, testing, and in case the build machine
-#       is not a 64-bit one, or has less than 8 GB RAM.
-#
-# * ignore-lost-context: (off by default)
-#       There is a flaw in the HTML Canvas specification. When the canvas'
-#       backing store is some kind of hardware resource like an OpenGL
-#       texture, this resource might get lost. In case of OpenGL textures,
-#       this happens when the OpenGL context gets lost. The canvas should then
-#       be repainted, but nothing in the Canvas standard reflects that. This
-#       packageconfig is to be used if the underlying OpenGL (ES) drivers do
-#       not lose the context, or if losing the context is considered okay
-#       (note that canvas contents can vanish then).
-#
-# * impl-side-painting: (off by default)
-#       This is a new painting mechanism. Still in
-#       development stages, it can improve performance See
-#       http://www.chromium.org/developers/design-documents/impl-side-painting
-#       for more.
-#
-# * kiosk-mode: (off by default)
-#       Enable this option if you want your browser to start up full-screen,
-#       without any menu bars, without any clutter, and without any initial
-#       start-up indicators.
-#
-# * proprietary-codecs: (off by default)
-#       Enable this option if you want to add support for additional proprietary
-#       codecs, most notably MPEG standards (h.264, h.265, MP4, MP3, AAC, MPEG-2 ..)
+S = "${WORKDIR}/gclient/src"  
 
 PACKAGECONFIG ??= "use-egl"
 
@@ -136,10 +66,6 @@ CHROMIUM_EXTRA_ARGS ?= " \
         ${@bb.utils.contains('PACKAGECONFIG', 'kiosk-mode', '--start-fullscreen --kiosk --no-first-run', '', d)} \
 "
 
-SRC_URI += "\
-        ${@bb.utils.contains('PACKAGECONFIG', 'component-build', 'file://component-build.gypi', '', d)} \
-        ${@oe.utils.conditional('CHROMIUM_ENABLE_WAYLAND', '1', 'git://github.com/01org/ozone-wayland.git;destsuffix=${OZONE_WAYLAND_GIT_DESTSUFFIX};branch=${OZONE_WAYLAND_GIT_BRANCH};rev=${OZONE_WAYLAND_GIT_SRCREV}', '', d)} \
-"
 
 
 # Some sanity checks.
@@ -164,34 +90,8 @@ python do_check_variables() {
 }
 addtask check_variables before do_fetch
 
-do_unpack[postfuncs] += "${@oe.utils.conditional('CHROMIUM_ENABLE_WAYLAND', '1', 'copy_ozone_wayland_files', '', d)}"
-do_patch[prefuncs] += "${@oe.utils.conditional('CHROMIUM_ENABLE_WAYLAND', '1', 'add_ozone_wayland_patches', '', d)}"
-
-copy_ozone_wayland_files() {
-	# ozone-wayland sources must be placed in an "ozone"
-	# subdirectory in ${S} in order for the .gyp build
-	# scripts to work
-	cp -r ${WORKDIR}/ozone-wayland-git ${S}/ozone
-}
-
-python add_ozone_wayland_patches() {
-    import glob
-    srcdir = d.getVar('S', True)
-    # find all ozone-wayland patches and add them to SRC_URI
-    upstream_patches_dir = srcdir + "/ozone/patches"
-    upstream_patches = glob.glob(upstream_patches_dir + "/" + d.getVar('OZONE_WAYLAND_PATCH_FILE_GLOB', True))
-    upstream_patches.sort()
-    for upstream_patch in upstream_patches:
-        d.appendVar('SRC_URI', ' file://' + upstream_patch)
-    # then, add the extra patches to SRC_URI order matters;
-    # extra patches may depend on the base ozone-wayland ones
-    d.appendVar('SRC_URI', ' ' + d.getVar('OZONE_WAYLAND_EXTRA_PATCHES', False))
-}
-
 EXTRA_OEGYP = " \
 	-Dangle_use_commit_id=0 \
-	-Dclang=0 \
-	-Dhost_clang=0 \
 	-Ddisable_fatal_linker_warnings=1 \
 	-Dlinux_use_bundled_gold=0 \
 	-Dlinux_use_bundled_binutils=0 \
@@ -213,9 +113,14 @@ python() {
 }
 
 do_configure_append() {
-
 	build/gyp_chromium --depth=. ${EXTRA_OEGYP}
+  python build/util/lastchange.py -o build/util/LASTCHANGE
+  python build/util/lastchange.py --git-hash-only \
+    -s third_party/WebKit \
+    -o build/util/LASTCHANGE.blink
+}
 
+do_unpack_append() {
 }
 
 do_compile() {

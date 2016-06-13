@@ -6,6 +6,7 @@ COMPATIBLE_MACHINE_x86 = "(.*)"
 COMPATIBLE_MACHINE_x86-64 = "(.*)"
 COMPATIBLE_MACHINE_armv6 = "(.*)"
 COMPATIBLE_MACHINE_armv7a = "(.*)"
+COMPATIBLE_MACHINE_aarch64 = "(.*)"
 
 # The build type defaults to Release. If you want a Debug build, you can set
 # the variable CHROMIUM_BUILD_TYPE to "Debug" in your conf/local.conf file.
@@ -20,11 +21,6 @@ do_configure() {
 	cd ${S}
 	GYP_DEFINES="${GYP_DEFINES}" export GYP_DEFINES
 	# replace LD with CXX, to workaround a possible gyp issue?
-	LD="${CXX}" export LD
-	CC="${CC}" export CC
-	CXX="${CXX}" export CXX
-	CC_host="${BUILD_CC}" export CC_host
-	CXX_host="${BUILD_CXX}" export CXX_host
 }
 
 do_install() {
